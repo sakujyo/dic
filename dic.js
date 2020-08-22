@@ -1,4 +1,17 @@
-function tag() {
+function prepare() {
+	chrome.storage.local.get(["dic"], (value) => {
+		tag(value["dic"]);
+	});
+}
+
+function tag(dic) {
+	if (document.location.toString().indexOf("translate.google.co.jp/?") > -1) {
+		let k = document.getElementsByClassName('gt-card-ttl-txt')[0].innerText;
+		let v = document.getElementsByClassName('tlid-translation translation')[0].innerText;
+		dic[k] = v;
+		chrome.storage.local.set({'dic': dic}, () => {});
+		return;
+	}
 	let b = document.body.innerHTML;
 	var d = '';
 	var i = 0;
@@ -10,23 +23,19 @@ function tag() {
 		}
 	}
 	var s = '';
-	var i = 0;
+	var i = 1;
 	for (var m of d.matchAll(/((?:<[^>]+>)*)([^<]*)/gi)) {
 		s += m[1];
 		s += m[2].replace(/[a-z]+/gi, (m, o, s) => {
-			return '<span class="w" tabindex=' + i++ + '>' + m + '</span>' 
+			let style = m in dic ? 'id="d"' : '';
+			return '<span class="w" ' + style + 'tabindex=' + i++ + '>' + m + '</span>' 
 		});
 	}
-	document.body.innerHTML = s + '<div id="dic"></div><style>\n.w {\n background-color: #fcfcfc;\n}\n#dic { position:fixed; display: block; width: 25%; height: 10%; right: 2%; bottom: 2%; color: #fff; background-color: #232323; padding: 5px; border-radius: 4px; box-shadow: 0 0 6px -1px #a3a3a3; z-index: 999999 }\n:focus { border-style: solid none solid; }\n</style>';
+	document.body.innerHTML = s + '<div id="dic"></div><style>\n#d { background-color: #f0f0f0; }\n.w {\n background-color: #fcfcfc;\n}\n#dic { position:fixed; display: block; font-size: 9pt; width: 68%; height: 12%; left: 18%; top: 1%; color: #fff; background-color: rgba(35, 35, 35, 0.6); padding: 5px; border-radius: 4px; box-shadow: 0 0 6px -1px #a3a3a3; z-index: 999999 }\n:focus { border-style: solid none solid; }\n</style>';
 
-	var d = { the: 'その', a: 'ひとつの', an: 'ひとつの' };
 	for (var el of document.getElementsByClassName('w')) {
 		el.addEventListener('keydown', (e) => {
 			if (e.key == "Tab") return;
-			console.log(e);
-			console.log(e.key);
-			console.log(e.target);
-			console.log(e.target.textContent);
 			//if ((e.key != 's') || (e.key != 'Enter')) return;
 			if (e.key == "a") {
 				let p = e.target.parentElement;
@@ -34,7 +43,7 @@ function tag() {
 					window.open(p.href);
 				}
 			} else if (e.key == 'q') {
-				let f = (e) => { if (e.tagName == 'BODY') { return 0; } else { console.log(e.offsetTop + ':' + e.tagName); return e.offsetTop + f(e.offsetParent); }}
+				let f = (e) => { if (e.tagName == 'BODY') { return 0; } else { return e.offsetTop + f(e.offsetParent); }}
 				let renderHeight = window.innerHeight;
 				let rh = renderHeight / 2;
 				let y = f(e.target) + e.target.offsetHeight / 2 - 1;
@@ -42,14 +51,15 @@ function tag() {
 			}
 			if ((e.key != 'w')) return;
 			let word = e.target.textContent;
-			if (word in d) {
-				document.getElementById('dic').textContent = d[word];
+			if (word in dic) {
+				document.getElementById('dic').textContent = dic[word].substring(0, 240);
 			} else {
 				document.getElementById('dic').textContent = '';
+				window.open('https://translate.google.co.jp/?hl=ja#view=home&op=translate&sl=en&tl=ja&text=' + word);
 			}
 		}
 		);
 	}
 
 }
-tag();
+prepare();

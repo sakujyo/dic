@@ -2,9 +2,17 @@
 	"manifest_version": 2,
 	"name": "dic",
 	"version": "0.1",
+	"author": "sakujyo",
+	"permissions": [
+		"storage",
+		"unlimitedStorage"
+	],
 	"content_scripts": [
 		{
-			//"matches": [ "*://*.com/*" ],
+			"matches": [
+				"https://translate.google.co.jp/*",
+				"*://*.com/*",
+			],
 			"js": [ "dic.js" ]
 		}
 	]
