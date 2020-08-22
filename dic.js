@@ -6,7 +6,7 @@ function prepare() {
 
 function tag(dic) {
 	if (document.location.toString().indexOf("translate.google.co.jp/?") > -1) {
-		let k = document.getElementsByClassName('gt-card-ttl-txt')[0].innerText;
+		let k = document.getElementsByClassName('gt-card-ttl-txt')[1].innerText;
 		let v = document.getElementsByClassName('tlid-translation translation')[0].innerText;
 		dic[k] = v;
 		chrome.storage.local.set({'dic': dic}, () => {});
