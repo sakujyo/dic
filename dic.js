@@ -1,6 +1,10 @@
 function prepare() {
 	chrome.storage.local.get(["dic"], (value) => {
 		tag(value["dic"]);
+		//setTimeout(() => {
+			//console.log('settimeout');
+			//tag(value["dic"]);
+		//}, 9999);
 	});
 }
 
@@ -10,7 +14,9 @@ function tag(dic) {
 		let k = document.getElementsByClassName('gt-ct-text')[0].innerText;
 		let v = document.getElementsByClassName('tlid-translation translation')[0].innerText;
 		//console.log(k + ': ' + v);
-		dic[k.toLowerCase()] = v;
+		if (k.toLowerCase() in dic == false) {
+			dic[k.toLowerCase()] = v;
+		}
 		//delete dic[''];
 		chrome.storage.local.set({'dic': dic}, () => {});
 		return;
@@ -18,6 +24,7 @@ function tag(dic) {
 	let b = document.body.innerHTML;
 	var d = '';
 	var i = 0;
+	// let d script removed of document
 	for (var m of b.matchAll(/<\/{0,1}script[^>]*>/gi)) {
 		if (m == '<\/script>') {
 			i = m.index + m[0].length;
@@ -70,6 +77,8 @@ function tag(dic) {
 		}
 	}
 
+	//setTimeout(() => {
+	//}, 29999);
 	var s = '';
 	var i = 1;
 	for (var m of d.matchAll(/((?:<[^>]+>)*)([^<]*)/gi)) {
